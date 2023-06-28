@@ -8,7 +8,7 @@ services:
       - '5432:5432'
     environment:
       - POSTGRES_HOST=localhost
-      - POSTGRES_USE=lesson
+      - POSTGRES_USER=lesson
       - POSTGRES_PASSWORD=lesson
       - POSTGRES_DATABASE=lesson
     command: postgres
