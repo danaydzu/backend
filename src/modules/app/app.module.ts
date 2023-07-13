@@ -5,7 +5,10 @@ import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import configurations from '../../configurations';
 import { SequelizeModule } from '@nestjs/sequelize';
-import {User} from "../user/models/user.model";
+import { User } from "../user/models/user.model";
+import { UserModule } from "../user/user.module";
+import { AuthModule } from "../auth/auth.module";
+import { TokenModule } from "../token/token.module";
 
 @Module({
   imports: [
@@ -29,6 +32,9 @@ import {User} from "../user/models/user.model";
         models: [User],
       }),
     }),
+      UserModule,
+      AuthModule,
+      TokenModule
   ],
 
   controllers: [AppController],
