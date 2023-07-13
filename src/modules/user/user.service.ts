@@ -3,7 +3,8 @@ import {users} from '../../moks';
 import {InjectModel} from "@nestjs/sequelize";
 import {User} from "./models/user.model";
 import * as bcrypt from 'bcrypt'
-import {createUserDTO} from "./dto";
+import {createUserDTO, UpdateUserDTO} from "./dto";
+
 
 @Injectable()
 export class UserService {
@@ -11,9 +12,12 @@ export class UserService {
 
     }
 
-    getUsers() {
-        return users;
+
+    async findUserByEmail(email: string) {
+
+        return this.userRepository.findOne({where: {email}})
     }
+
 
     async hashPassword(password) {
         return bcrypt.hash(password, 10)
@@ -21,9 +25,33 @@ export class UserService {
     }
 
     // @ts-ignore
-    async createUser(dto): Promise<createUserDTO> {
+    async createUser(dto: createUserDTO): Promise<createUserDTO> {
+
         dto.password = await this.hashPassword(dto.password)
-        await this.userRepository.create(dto)
+        await this.userRepository.create({
+            firstName: dto.firstName,
+            username: dto.username,
+            email: dto.email,
+            password: dto.password
+        })
         return dto
+    }
+
+    public publicUser(email: string) {
+        return this.userRepository.findOne({
+            where: {email},
+            attributes: {exclude: ['password']}
+        })
+    }
+
+    async updateUser(email: string, dto: UpdateUserDTO) : Promise<UpdateUserDTO>{
+        await this.userRepository.update(dto, {where: {email}})
+        return dto
+    }
+
+    async deleteUser(email: string){
+        await this.userRepository.destroy({ where: { email } })
+        return true
+
     }
 }

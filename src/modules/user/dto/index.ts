@@ -1,20 +1,33 @@
-import {isString} from "@nestjs/common/utils/shared.utils";
+import { IsString } from "class-validator";
+import { ApiProperty } from "@nestjs/swagger";
 
 export class createUserDTO {
-    // @ts-ignore
-    @isString()
-    firstName: string
 
-    // @ts-ignore
-    @isString()
+    @ApiProperty()
+    @IsString()
+    firstName: string
+    
+    @ApiProperty()
+    @IsString()
     username: string
 
-    // @ts-ignore
-    @isString()
+    @ApiProperty()
+    @IsString()
     email: string
 
-    // @ts-ignore
-    @isString()
+    @ApiProperty()
+    @IsString()
     password: string
 }
 
+export class UpdateUserDTO {
+    @ApiProperty()
+    @IsString()
+    firstName: string
+    @ApiProperty()
+    @IsString()
+    username: string
+    @ApiProperty()
+    @IsString()
+    email: string
+}
