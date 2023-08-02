@@ -18,13 +18,14 @@ export class AuthService {
     ) {
     }
 
-    async registerUser(dto: createUserDTO): Promise<createUserDTO> {
+    async registerUser(dto: createUserDTO): Promise<AuthUserResponse> {
         try {
             const existUser = await this.userService.findUserByEmail(dto.email)
             if (existUser) throw new BadRequestException(AppError.USER_EXIST)
-            return this.userService.createUser(dto)
+            await this.userService.createUser(dto);
+            return  this.userService.publicUser(dto.email)
         } catch (e) {
-            throw new Error(e)
+            throw e
         }
     }
 
@@ -37,11 +38,10 @@ export class AuthService {
             const validatePassword = await bcrypt.compare(dto.password, existUser.password)
             if (!validatePassword) throw new BadRequestException(AppError.WRONG_DATA)
 
-            const user = await this.userService.publicUser(dto.email)
-            const token = await this.tokenService.generateJwtToken(user)
-            return {user, token}
+            return  this.userService.publicUser(dto.email)
+
         } catch (e) {
-            throw new Error(e)
+            throw e
         }
     }
 }

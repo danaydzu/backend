@@ -5,11 +5,16 @@ import {User} from "./models/user.model";
 import * as bcrypt from 'bcrypt'
 import {createUserDTO, UpdateUserDTO} from "./dto";
 import {Watchlist} from "../watchlist/models/watchlist.model";
+import {TokenService} from "../token/token.service";
+import {AuthUserResponse} from "../auth/response";
 
 
 @Injectable()
 export class UserService {
-    constructor(@InjectModel(User) private readonly userRepository: typeof User) {
+    constructor(
+        @InjectModel(User) private readonly userRepository: typeof User,
+        private readonly tokenService: TokenService
+    ) {
 
     }
 
@@ -24,7 +29,7 @@ export class UserService {
                 }
             })
         } catch (e) {
-            throw new Error(e)
+            throw e
         }
     }
 
@@ -33,7 +38,7 @@ export class UserService {
         try {
             return bcrypt.hash(password, 10)
         } catch (e) {
-            throw new Error(e)
+            throw e
         }
 
     }
@@ -51,13 +56,13 @@ export class UserService {
             })
             return dto
         } catch (e) {
-            throw new Error(e)
+            throw e
         }
     }
 
-    async publicUser(email: string): Promise<User> {
+    async publicUser(email: string): Promise<AuthUserResponse> {
         try {
-            return this.userRepository.findOne({
+           const user = await this.userRepository.findOne({
                 where: {email},
                 attributes: {exclude: ['password']},
                 include: {
@@ -65,8 +70,10 @@ export class UserService {
                     required: false
                 }
             })
+            const token = await this.tokenService.generateJwtToken(user)
+            return {user, token}
         } catch (e) {
-            throw new Error(e)
+            throw e
         }
     }
 
@@ -75,7 +82,7 @@ export class UserService {
             await this.userRepository.update(dto, {where: {email}})
             return dto
         } catch (e) {
-            throw new Error(e)
+            throw e
         }
     }
 
@@ -84,7 +91,7 @@ export class UserService {
             await this.userRepository.destroy({where: {email}})
             return true
         } catch (e) {
-            throw new Error(e)
+            throw e
         }
 
     }
